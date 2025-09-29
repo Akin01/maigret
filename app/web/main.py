@@ -14,7 +14,7 @@ from app.maigret.result import MaigretCheckStatus
 import uvicorn
 
 # Configuration
-MAIGRET_DB_FILE = os.path.join('app', 'maigret', 'resources', 'data.json')
+MAIGRET_DB_FILE = os.path.join('app', 'maigret', 'resources', 'maigret.db')
 COOKIES_FILE = "cookies.txt"
 REPORTS_FOLDER = os.path.abspath('/tmp/maigret_reports')
 
@@ -34,7 +34,7 @@ def setup_logger(log_level, name):
 async def maigret_search(username, options):
     logger = setup_logger(logging.WARNING, 'maigret')
     try:
-        db = MaigretDatabase().load_from_path(MAIGRET_DB_FILE)
+        db = await MaigretDatabase().load_from_path(MAIGRET_DB_FILE)
 
         top_sites = int(options.get('top_sites') or 500)
         if options.get('all_sites'):
@@ -96,7 +96,7 @@ def process_search_task(usernames, options, timestamp):
         os.makedirs(session_folder, exist_ok=True)
 
         graph_path = os.path.join(session_folder, "combined_graph.html")
-        db = MaigretDatabase().load_from_path(MAIGRET_DB_FILE)
+        db = loop.run_until_complete(MaigretDatabase().load_from_path(MAIGRET_DB_FILE))
         save_graph_report(graph_path, general_results, db)
 
         individual_reports = []
@@ -160,7 +160,7 @@ def process_search_task(usernames, options, timestamp):
 
 @app.get("/", response_class=HTMLResponse, name="index")
 async def index(request: Request):
-    db = MaigretDatabase().load_from_path(MAIGRET_DB_FILE)
+    db = await MaigretDatabase().load_from_path(MAIGRET_DB_FILE)
     site_options = sorted(set([site.name for site in db.sites] + [site.url_main for site in db.sites if site.url_main]))
     return templates.TemplateResponse("index.html", {"request": request, "site_options": site_options})
 
