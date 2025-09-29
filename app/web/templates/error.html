@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="text-center py-16">
+    <h2 class="text-3xl font-bold text-red-500 mb-4">An Error Occurred</h2>
+    <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
+        {{ error_message|default('An unknown error occurred.', true) }}
+    </p>
+    <a href="{{ url_for('index') }}" class="px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg shadow-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+        Go Back to Homepage
+    </a>
+</div>
+{% endblock %}

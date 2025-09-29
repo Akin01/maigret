@@ -1,148 +1,73 @@
 {% extends "base.html" %}
 {% block content %}
-<style>
-    .tag-badge {
-       background-color: #214e7b;
-       padding: 2px 8px;
-       border-radius: 12px;
-       font-size: 14px;
-       display: inline-flex;
-       align-items: center;
-       gap: 5px;
-       margin: 2px;
-       color: white;
-    }
-    
-    .profile-list {
-       list-style: none;
-       padding: 0;
-    }
-    
-    .profile-item {
-       margin-bottom: 10px;
-       padding: 10px;
-       display: flex;
-       justify-content: space-between;
-       align-items: center;
-       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .profile-link {
-       display: flex;
-       align-items: center;
-       gap: 8px;
-    }
-    
-    .favicon {
-       width: 16px;
-       height: 16px;
-    }
-    
-    .tag-container {
-       display: flex;
-       flex-wrap: wrap;
-       gap: 5px;
-       justify-content: flex-end;
-    }
-    
-    .report-container {
-       margin-bottom: 1rem;
-    }
-    
-    .report-header {
-       cursor: pointer;
-       padding: 1rem;
-       background: rgba(255, 255, 255, 0.05);
-       border-radius: 4px;
-       margin-bottom: 0.5rem;
-    }
-    
-    .report-content {
-       display: none;
-    }
-    
-    .report-content.show {
-       display: block;
-    }
-    
-    .chevron::after {
-       content: '▼';
-       margin-left: 8px;
-       transition: transform 0.2s;
-    }
-    
-    .chevron.collapsed::after {
-       transform: rotate(-90deg);
-    }
-    </style>
+<div class="form-container">
+    <h1 class="text-3xl font-bold mb-4">Search Results</h1>
 
-    <div class="form-container">
-        <h1 class="mb-4">Search Results</h1>
-     
-        <p>The search has completed. <a href="{{ url_for('index')}}">Back to start.</a></p>
-     
-        {% if graph_file %}
-        <h3>Combined Graph</h3>
-        <iframe src="{{ url_for('download_report', filename=graph_file) }}" style="width:100%; height:600px; border:none;"></iframe>
-        {% endif %}
-     
-        <hr>
-     
-        {% if individual_reports %}
-        <h3>Individual Reports</h3>
-        <div class="reports-list">
-            {% for report in individual_reports %}
-            <div class="report-container">
-                <div class="report-header" onclick="toggleReport(this)" data-target="report-{{ loop.index }}">
-                    <h5 class="mb-0 d-flex align-items-center">
-                        <span>{{ report.username }}</span>
-                        <span class="chevron"></span>
-                    </h5>
-                </div>
-                <div id="report-{{ loop.index }}" class="report-content">
-                    <p>
-                        <a href="{{ url_for('download_report', filename=report.csv_file) }}">CSV Report</a> |
-                        <a href="{{ url_for('download_report', filename=report.json_file) }}">JSON Report</a> |
-                        <a href="{{ url_for('download_report', filename=report.pdf_file) }}">PDF Report</a> |
-                        <a href="{{ url_for('download_report', filename=report.html_file) }}">HTML Report</a>
-                    </p>
-                    {% if report.claimed_profiles %}
-                    <strong>Claimed Profiles:</strong>
-                    <ul class="profile-list">
-                        {% for profile in report.claimed_profiles %}
-                        <li class="profile-item">
-                            <div class="profile-link">
-                                <img class="favicon" src="https://www.google.com/s2/favicons?domain={{ profile.url }}" onerror="this.style.display='none'" alt="">
-                                <a href="{{ profile.url }}" target="_blank">{{ profile.site_name }}</a>
-                            </div>
-                            {% if profile.tags %}
-                            <div class="tag-container">
-                                {% for tag in profile.tags %}
-                                <span class="tag-badge">{{ tag }}</span>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p>No claimed profiles found.</p>
-                    {% endif %}
-                </div>
+    <p class="mb-6">The search has completed. <a href="{{ url_for('index')}}" class="text-primary-500 hover:underline">Back to start.</a></p>
+
+    {% if graph_file %}
+    <div class="mb-8">
+        <h3 class="text-2xl font-semibold mb-4">Combined Graph</h3>
+        <iframe src="{{ url_for('download_report', path=graph_file) }}" class="w-full h-[600px] border-0 rounded-lg shadow-md"></iframe>
+    </div>
+    {% endif %}
+
+    <hr class="my-8 border-gray-200 dark:border-gray-700">
+
+    {% if individual_reports %}
+    <h3 class="text-2xl font-semibold mb-4">Individual Reports</h3>
+    <div class="space-y-4">
+        {% for report in individual_reports %}
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+            <div class="p-4 cursor-pointer flex justify-between items-center" onclick="toggleReport('report-{{ loop.index }}')">
+                <h5 class="text-lg font-semibold">{{ report.username }}</h5>
+                <svg class="w-6 h-6 chevron transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </div>
-            {% endfor %}
+            <div id="report-{{ loop.index }}" class="px-8 pb-6 hidden">
+                <div class="flex flex-wrap gap-4 mb-4">
+                    <a href="{{ url_for('download_report', path=report.csv_file) }}" class="text-primary-500 hover:underline">CSV Report</a>
+                    <a href="{{ url_for('download_report', path=report.json_file) }}" class="text-primary-500 hover:underline">JSON Report</a>
+                    <a href="{{ url_for('download_report', path=report.pdf_file) }}" class="text-primary-500 hover:underline">PDF Report</a>
+                    <a href="{{ url_for('download_report', path=report.html_file) }}" class="text-primary-500 hover:underline">HTML Report</a>
+                </div>
+
+                {% if report.claimed_profiles %}
+                <strong class="block mb-2">Claimed Profiles:</strong>
+                <ul class="space-y-2">
+                    {% for profile in report.claimed_profiles %}
+                    <li class="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center gap-3">
+                            <img class="w-4 h-4" src="https://www.google.com/s2/favicons?domain={{ profile.url }}" onerror="this.style.display='none'" alt="">
+                            <a href="{{ profile.url }}" target="_blank" class="text-primary-500 hover:underline">{{ profile.site_name }}</a>
+                        </div>
+                        {% if profile.tags %}
+                        <div class="flex flex-wrap gap-2">
+                            {% for tag in profile.tags %}
+                            <span class="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 text-xs font-medium rounded-full">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No claimed profiles found.</p>
+                {% endif %}
+            </div>
         </div>
-        {% else %}
-        <p>No individual reports available.</p>
-        {% endif %}
-     </div>
-     
-     <script>
-     function toggleReport(header) {
-        const reportId = header.getAttribute('data-target');
-        const content = document.getElementById(reportId);
-        content.classList.toggle('show');
-        header.querySelector('.chevron').classList.toggle('collapsed');
-     }
-     </script>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No individual reports available.</p>
+    {% endif %}
+</div>
+
+<script>
+ function toggleReport(reportId) {
+    const content = document.getElementById(reportId);
+    const chevron = content.previousElementSibling.querySelector('.chevron');
+    content.classList.toggle('hidden');
+    chevron.classList.toggle('rotate-180');
+ }
+</script>
 {% endblock %}
