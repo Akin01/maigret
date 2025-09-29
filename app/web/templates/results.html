@@ -78,14 +78,6 @@
 
     <div class="form-container">
         <h1 class="mb-4">Search Results</h1>
-        <!-- Flash messages -->
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                <div class="alert alert-info">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
      
         <p>The search has completed. <a href="{{ url_for('index')}}">Back to start.</a></p>
      

@@ -1,7 +1,6 @@
 """Maigret"""
 
 __title__ = 'Maigret'
-__package__ = 'maigret'
 __author__ = 'Soxoj'
 __author_email__ = 'soxoj@protonmail.com'
 
